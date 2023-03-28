@@ -89,9 +89,9 @@ onMounted(() => {
             <div class="card-body">
               <div data-bs-custom-class="custom-tooltip" data-bs-toggle="tooltip"
                 data-bs-title="Refers to the total value of all cryptocurrencies in circulation.">
-                <h5 class="card-title text-white fs-4 mb-2">{{
-                  identificarCantidadMonetaria(parseFloat(props.stats.totalMarketCap)) }}
-                  <font-awesome-icon :icon="['fas', 'circle-info']" style="font-size: 0.8em; color: blue;" />
+                <h5 class="card-title text-white fs-4 mb-2">
+                  {{ identificarCantidadMonetaria(parseFloat(props.stats.totalMarketCap)) }}
+                  <font-awesome-icon :icon="['fa', 'circle-info']" style="font-size: 0.8em; color: blue;" />
                 </h5>
               </div>
               <p class="card-text text-white">Market Cap</p>
@@ -99,9 +99,9 @@ onMounted(() => {
             <div class="card-body">
               <div data-bs-custom-class="custom-tooltip" data-bs-toggle="tooltip"
                 data-bs-title="Refers to the trading volume of all currencies combined.">
-                <h5 class="card-title text-white fs-4 mb-2">{{
-                  identificarCantidadMonetaria(parseFloat(props.stats.total24hVolume)) }}
-                  <font-awesome-icon :icon="['fas', 'circle-info']" style="font-size: 0.8em; color: blue;" />
+                <h5 class="card-title text-white fs-4 mb-2">
+                  {{ identificarCantidadMonetaria(parseFloat(props.stats.total24hVolume)) }}
+                  <font-awesome-icon :icon="['fa', 'circle-info']" style="font-size: 0.8em; color: blue;" />
                 </h5>
               </div>
               <p class="card-text text-white">Trading Volume</p>
@@ -114,7 +114,8 @@ onMounted(() => {
               <p class="card-text text-white">All Coins</p>
             </div>
           </div>
-          <p class="card-text text-white">All coins listed, you get circulating supplies, social links, logos, blocks.
+          <p class="card-text crypto-text text-white">All coins listed, you get circulating supplies, social links, logos,
+            blocks.
             explorers, sparklines and more. We have it all.
           </p>
         </div>
@@ -127,16 +128,13 @@ onMounted(() => {
         <input type="text" class="form-input bg-transparent border border-0 fw-semibold text-light"
           placeholder="Search a coin" aria-describedby="button" aria-label="Search" @keyup="handleKeyUp()" ref="inputRef">
         <button type="button" class="search-clear bg-transparent border border-0" @click="handleSearchClear()">
-          <font-awesome-icon :icon="['fas', 'fa-xmark']" style="color: #a9a9a9" />
+          <font-awesome-icon :icon="['fa', 'fa-xmark']" style="font-size: 1.2em; color: #a9a9a9" />
         </button>
       </div>
-      <router-link to="/favorites" class="button-favorite text-decoration-none text-light">
+      <router-link to="/favorites" class="text-decoration-none text-light">
         <button type="button" class="btn">Favorites
-          <font-awesome-icon :icon="['fas', 'heart']" style="color: #ffffff" />
+          <font-awesome-icon :icon="['fa', 'heart']" style="font-size: 1em; color: #ffffff;" />
         </button>
-      </router-link>
-      <router-link to="/favorites" class="icon-favorite text-decoration-none text-light">
-        <font-awesome-icon :icon="['fas', 'heart']" style="color: #ffffff" />
       </router-link>
     </div>
   </div>
@@ -155,6 +153,7 @@ onMounted(() => {
 .crypto-title {
   font-size: 38px;
   line-height: 60px;
+  margin-right: 20px;
 }
 
 .card-title {
@@ -190,6 +189,7 @@ onMounted(() => {
   border: none;
   font-size: 14px;
   font-family: 'Quicksand', sans-serif;
+  white-space: nowrap;
 }
 
 @media only screen and (max-width: 990px) {
@@ -201,17 +201,19 @@ onMounted(() => {
     margin-bottom: 25px;
     line-height: 50px;
   }
+
+  .crypto-text {
+    margin-right: 200px;
+  }
 }
 
 @media only screen and (max-width: 792px) {
   .container-fluid {
     padding: 0 27px;
   }
-}
 
-@media only screen and (min-width: 540px) {
-  .icon-favorite {
-    display: none;
+  .crypto-title {
+    margin-right: 0px;
   }
 }
 
@@ -220,12 +222,12 @@ onMounted(() => {
     display: none;
   }
 
-  .button-favorite {
-    display: none;
-  }
-
   .container-stats {
     width: 100%;
+  }
+
+  .crypto-text {
+    margin-right: 0px;
   }
 }
 </style>

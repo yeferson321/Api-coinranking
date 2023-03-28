@@ -21,7 +21,8 @@
                             rel="noopener">Chartjs</a>
                     </li>
                     <li class="nav-item ps-3">
-                        <a class="btn btn-outline-light px-4" href="#" role="button">GitHub</a>
+                        <a class="btn btn-outline-light px-4" href="https://github.com/yeferson321/Api-coinranking"
+                            role="button">GitHub</a>
                     </li>
                 </ul>
             </div>

@@ -2,53 +2,57 @@
 import { ref } from "@vue/reactivity";
 import { Ref, onMounted } from "vue";
 import { Coin, Stats } from "../interfaces/Data";
-import * as bootstrap from 'bootstrap';
+import * as bootstrap from "bootstrap";
 
 const inputRef: Ref<HTMLInputElement | null> = ref(null);
-const error: Ref<string> = ref("")
+const error: Ref<string> = ref("");
 
 const props = defineProps({
     coins: {
         type: Array as () => Coin[],
-        required: true
+        required: true,
     },
     stats: {
         type: Object as () => Stats,
-        required: true
+        required: true,
     },
     loadData: {
         type: Function,
-        required: true
+        required: true,
     },
     search: {
         type: Function,
-        required: true
+        required: true,
     },
 });
 
 const emits = defineEmits<{
-    (event: 'onChangeCoins', value: Coin[]): void
-    (event: 'onChangeState', value: boolean): void
-    (event: 'onChangeResult', value: boolean): void
+    (event: "onChangeCoins", value: Coin[]): void;
+    (event: "onChangeState", value: boolean): void;
+    (event: "onChangeResult", value: boolean): void;
 }>();
 
 const handleKeyUp = () => {
     setTimeout(async function () {
         await props.loadData();
 
-        const result = props.coins.filter(item => item.name.toLowerCase().includes(inputRef.value?.value?.toLowerCase() ?? ''));
+        const result = props.coins.filter((item) =>
+            item.name
+                .toLowerCase()
+                .includes(inputRef.value?.value?.toLowerCase() ?? "")
+        );
 
         if (result.length) {
-            props.search(result)
-            emits('onChangeCoins', result)
-            emits('onChangeState', true)
+            props.search(result);
+            emits("onChangeCoins", result);
+            emits("onChangeState", true);
         } else {
-            emits('onChangeCoins', result)
-            emits('onChangeState', false)
-            emits('onChangeResult', true)
+            emits("onChangeCoins", result);
+            emits("onChangeState", false);
+            emits("onChangeResult", true);
         }
     }, 1000);
-}
+};
 
 const identificarCantidadMonetaria = (valor: number) => {
     const sufijos = ["", " K", " M", " B", " T"]; // Sufijos de los miles, millones, billones y billones de billones
@@ -62,19 +66,23 @@ const identificarCantidadMonetaria = (valor: number) => {
     }
 
     return simbolo + valor.toFixed(precision) + sufijos[i];
-}
+};
 
 const handleSearchClear = () => {
     if (inputRef.value?.value) {
-        inputRef.value.value = '';
+        inputRef.value.value = "";
         props.loadData();
-        emits('onChangeState', true)
+        emits("onChangeState", true);
     }
-}
+};
 
 onMounted(() => {
-    const tooltipTriggerList = document.querySelectorAll<HTMLElement>('[data-bs-toggle="tooltip"]');
-    const tooltipList = Array.prototype.slice.call(tooltipTriggerList).map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    const tooltipTriggerList = document.querySelectorAll<HTMLElement>(
+        '[data-bs-toggle="tooltip"]'
+    );
+    const tooltipList = Array.prototype.slice
+        .call(tooltipTriggerList)
+        .map((tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl));
 });
 </script>
 
@@ -83,8 +91,9 @@ onMounted(() => {
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col">
-                    <h5 class="card-title crypto-title text-white">Crypto Currency prices in real time like BNB,
-                        DOGE and <span style="color:blue">Thousands more</span>
+                    <h5 class="card-title crypto-title text-white">
+                        Crypto Currency prices in real time like BNB, DOGE and
+                        <span style="color: blue">Thousands more</span>
                     </h5>
                 </div>
                 <div class="col">
@@ -92,10 +101,14 @@ onMounted(() => {
                         <div class="card-body">
                             <div data-bs-custom-class="custom-tooltip" data-bs-toggle="tooltip"
                                 data-bs-title="Refers to the total value of all cryptocurrencies in circulation.">
-                                <h5 class="card-title text-white fs-4 mb-2">{{
-                                    identificarCantidadMonetaria(parseFloat(props.stats.totalMarketCap)) }}
-                                    <font-awesome-icon :icon="['fas', 'circle-info']"
-                                        style="font-size: 0.8em; color: blue;" />
+                                <h5 class="card-title text-white fs-4 mb-2">
+                                    {{
+                                        identificarCantidadMonetaria(
+                                            parseFloat(props.stats.totalMarketCap)
+                                        )
+                                    }}
+                                    <font-awesome-icon :icon="['fa', 'circle-info']"
+                                        style="font-size: 0.8em; color: blue" />
                                 </h5>
                             </div>
                             <p class="card-text text-white">Market Cap</p>
@@ -103,10 +116,14 @@ onMounted(() => {
                         <div class="card-body">
                             <div data-bs-custom-class="custom-tooltip" data-bs-toggle="tooltip"
                                 data-bs-title="Refers to the trading volume of all currencies combined.">
-                                <h5 class="card-title text-white fs-4 mb-2">{{
-                                    identificarCantidadMonetaria(parseFloat(props.stats.total24hVolume)) }}
-                                    <font-awesome-icon :icon="['fas', 'circle-info']"
-                                        style="font-size: 0.8em; color: blue;" />
+                                <h5 class="card-title text-white fs-4 mb-2">
+                                    {{
+                                        identificarCantidadMonetaria(
+                                            parseFloat(props.stats.total24hVolume)
+                                        )
+                                    }}
+                                    <font-awesome-icon :icon="['fa', 'circle-info']"
+                                        style="font-size: 0.8em; color: blue" />
                                 </h5>
                             </div>
                             <p class="card-text text-white">Trading Volume</p>
@@ -114,14 +131,16 @@ onMounted(() => {
                         <div class="card-body">
                             <div data-bs-custom-class="custom-tooltip" data-bs-toggle="tooltip"
                                 data-bs-title="Refers to all available trading currencies.">
-                                <h5 class="card-title text-white fs-4 mb-2">{{ props.stats.totalCoins }}</h5>
+                                <h5 class="card-title text-white fs-4 mb-2">
+                                    {{ props.stats.totalCoins }}
+                                </h5>
                             </div>
                             <p class="card-text text-white">All Coins</p>
                         </div>
                     </div>
-                    <p class="card-text text-white">All coins listed, you get circulating supplies, social links, logos,
-                        blocks.
-                        explorers, sparklines and more. We have it all.
+                    <p class="card-text crypto-text text-white">
+                        All coins listed, you get circulating supplies, social links, logos,
+                        blocks. explorers, sparklines and more. We have it all.
                     </p>
                 </div>
             </div>
@@ -132,18 +151,16 @@ onMounted(() => {
             <div class="container-input d-flex align-items-center">
                 <input type="text" class="form-input bg-transparent border border-0 fw-semibold text-light"
                     placeholder="Search a coin" aria-describedby="button" aria-label="Search" @keyup="handleKeyUp()"
-                    ref="inputRef">
+                    ref="inputRef" />
                 <button type="button" class="search-clear bg-transparent border border-0" @click="handleSearchClear()">
-                    <font-awesome-icon :icon="['fas', 'fa-xmark']" style="color: #a9a9a9" />
+                    <font-awesome-icon :icon="['fa', 'fa-xmark']" style="font-size: 1.2em; color: #a9a9a9" />
                 </button>
             </div>
-            <router-link to="/" class="button-favorite text-decoration-none text-light">
-                <button type="button" class="btn">All Coins
-                    <font-awesome-icon :icon="['fas', 'bitcoin-sign']" style="color: #ffffff" />
+            <router-link to="/" class="text-decoration-none text-light">
+                <button type="button" class="btn">
+                    All Coins
+                    <font-awesome-icon :icon="['fa', 'coins']" style="font-size: 1em; color: #ffffff" />
                 </button>
-            </router-link>
-            <router-link to="/" class="icon-coins text-decoration-none text-light">
-                <font-awesome-icon :icon="['fas', 'bitcoin-sign']" style="color: #ffffff" />
             </router-link>
         </div>
     </div>
@@ -162,10 +179,11 @@ onMounted(() => {
 .crypto-title {
     font-size: 38px;
     line-height: 60px;
+    margin-right: 20px;
 }
 
 .card-title {
-    font-family: 'Quicksand', sans-serif;
+    font-family: "Quicksand", sans-serif;
     font-weight: 700;
 }
 
@@ -196,17 +214,22 @@ onMounted(() => {
     color: white;
     border: none;
     font-size: 14px;
-    font-family: 'Quicksand', sans-serif;
+    font-family: "Quicksand", sans-serif;
+    white-space: nowrap;
 }
 
 @media only screen and (max-width: 990px) {
     .row {
-        flex-direction: column
+        flex-direction: column;
     }
 
     .crypto-title {
         margin-bottom: 25px;
         line-height: 50px;
+    }
+
+    .crypto-text {
+        margin-right: 200px;
     }
 }
 
@@ -214,12 +237,10 @@ onMounted(() => {
     .container-fluid {
         padding: 0 27px;
     }
-}
 
-@media only screen and (min-width: 540px) {
-  .icon-coin {
-    display: none;
-  }
+    .crypto-title {
+        margin-right: 0px;
+    }
 }
 
 @media only screen and (max-width: 540px) {
@@ -227,12 +248,12 @@ onMounted(() => {
         display: none;
     }
 
-    .button-favorite {
-        display: none;
-    }
-
     .container-stats {
         width: 100%;
+    }
+
+    .crypto-text {
+        margin-right: 0px;
     }
 }
 </style>
