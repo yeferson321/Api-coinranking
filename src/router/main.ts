@@ -1,7 +1,8 @@
 import { RouteRecordRaw, createRouter, createWebHistory } from 'vue-router';
 
 const routes: RouteRecordRaw[] = [
-    { path: '/', alias: '/home', name: 'Home', component: () => import('../components/Section.vue') }, 
+    { path: '/', alias: '/home', name: 'home', component: () => import('../components/Homepage.vue') }, 
+    { path: '/favorites', alias: '/favorites', name: 'favorites', component: () => import('../components/Favorites.vue') }, 
     { path: '/:noPage(.*)', name: 'noPage', redirect: '/' }
 ]
 
