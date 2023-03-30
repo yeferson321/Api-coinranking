@@ -128,7 +128,7 @@ onMounted(() => {
         <input type="text" class="form-input bg-transparent border border-0 fw-semibold text-light"
           placeholder="Search a coin" aria-describedby="button" aria-label="Search" @keyup="handleKeyUp()" ref="inputRef">
         <button type="button" class="search-clear bg-transparent border border-0" @click="handleSearchClear()">
-          <font-awesome-icon :icon="['fa', 'fa-xmark']" style="font-size: 1.2em; color: #a9a9a9" />
+          <font-awesome-icon :icon="['fa', 'fa-xmark']" style="font-size: 1.2em; color: #a9a9a9;" />
         </button>
       </div>
       <router-link to="/favorites" class="text-decoration-none text-light">

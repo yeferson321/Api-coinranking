@@ -108,7 +108,7 @@ onMounted(() => {
                                         )
                                     }}
                                     <font-awesome-icon :icon="['fa', 'circle-info']"
-                                        style="font-size: 0.8em; color: blue" />
+                                        style="font-size: 0.8em; color: blue;" />
                                 </h5>
                             </div>
                             <p class="card-text text-white">Market Cap</p>
@@ -123,7 +123,7 @@ onMounted(() => {
                                         )
                                     }}
                                     <font-awesome-icon :icon="['fa', 'circle-info']"
-                                        style="font-size: 0.8em; color: blue" />
+                                        style="font-size: 0.8em; color: blue;" />
                                 </h5>
                             </div>
                             <p class="card-text text-white">Trading Volume</p>

@@ -172,7 +172,7 @@ watchEffect(async () => {
           </tr>
         </thead>
 
-        <!-- <tbody v-if="!isLoading">
+        <tbody v-if="!isLoading">
           <tr v-for="(cryptos, index) in coins" :key="index">
             <td>
               <div class="d-flex align-items-center gap-3">
@@ -267,13 +267,13 @@ watchEffect(async () => {
               </div>
             </td>
           </tr>
-        </tbody> -->
+        </tbody>
 
-        <!-- <div class="text-center" v-else>
+        <div class="text-center" v-else>
           <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
-        </div> -->
+        </div>
       </table>
     </div>
   </div>

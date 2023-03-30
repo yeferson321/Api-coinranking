@@ -31,6 +31,7 @@
 </template>
 
 <style scoped>
+
 .navbar-brand {
     font-family: 'Quicksand', sans-serif;
     color: #ffffff;
@@ -66,6 +67,7 @@
 
     .container-fluid {
         margin: 0 15px;
+        
     }
 }
 

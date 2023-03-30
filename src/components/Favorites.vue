@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "@vue/reactivity";
-import { onMounted, onBeforeUnmount, Ref, watchEffect, watch } from "vue";
+import { Ref, watchEffect } from "vue";
 import { Chart, ChartConfiguration, ChartItem } from "chart.js/auto";
 import { getFavoritesCoinsCurrencies } from "../services/CoinService";
 import { Coin, Stats } from "../interfaces/Data";
@@ -139,6 +139,29 @@ const removeFavorite = async (uuid: string): Promise<void> => {
   }
 };
 
+
+const convertirADolar = (numero: number) => {
+  // Formatear el número con dos decimales y separador de miles
+  let valorFormateado = numero.toFixed(3).replace(/\d(?=(\d{3})+\.)/g, "$&,");
+  let simbolo = "$ "; // Símbolo de la moneda
+
+  return simbolo + valorFormateado;
+}
+
+const identificarCantidadMonetaria = (valor: number) => {
+  const sufijos = [" Dollars", " Dollars", " Million", " Billion", " Trillion"]; // Sufijos de los miles, millones, billones y billones de billones
+  const precision = 2; // Precisión decimal para el redondeo
+  let simbolo = "$ "; // Símbolo de la moneda
+
+  let i = 0; // Índice para el arreglo de sufijos
+  while (valor >= 1000) {
+    valor /= 1000;
+    i++;
+  }
+
+  return simbolo + valor.toFixed(precision) + sufijos[i];
+};
+
 watchEffect(() => {
   searchCoins();
 });
@@ -146,128 +169,102 @@ watchEffect(() => {
 
 <template>
   <Navbar />
-  <SearchFavorites
-    @onChangeCoins="coins = $event"
-    @onChangeState="noFound = $event"
-    @onChangeResult="noResults = $event"
-    :loadData="searchCoins"
-    :search="search"
-    :stats="stats"
-    :coins="coins"
-  />
+  <SearchFavorites @onChangeCoins="coins = $event" @onChangeState="noFound = $event" @onChangeResult="noResults = $event"
+    :loadData="searchCoins" :search="search" :stats="stats" :coins="coins" />
 
-  <div>
-    <!-- <div class="container"> -->
-      <!-- <table class="table table-borderless ps-5">
-        <thead>
-          <tr class="text-white">
-            <th>All coins favorites</th>
-            <th>Price</th>
-            <th>Market cap</th>
-            <th>Sparkline</th>
-          </tr>
-        </thead>
-        <tbody v-if="!isLoading">
-          <tr v-for="(cryptos, index) in coins" :key="index">
-            <td>
-              <div class="d-flex align-items-center gap-3">
-                <button
-                  type="button"
-                  class="search-clear bg-transparent border border-0"
-                  @click="removeFavorite(cryptos.uuid)"
-                >
-                  <font-awesome-icon
-                    :icon="['fas', 'heart']"
-                    style="color: blueviolet"
-                  />
+  <div class="container-fluid">
+
+    <table class="table table-borderless">
+
+      <thead>
+        <tr class="text-table">
+          <th>All coins favorites</th>
+          <th>Price</th>
+          <th class="hide">Market cap</th>
+          <th class="text-end">Sparkline</th>
+        </tr>
+      </thead>
+
+      <tbody v-if="!isLoading">
+
+        <tr class="table-row">
+          <td colspan="4">
+            <div style="height: 30px;"></div>
+          </td>
+        </tr>
+
+        <tr class="text-table" v-for="(cryptos, index) in coins" :key="index">
+
+          <!--   -->
+
+          <td class="table-cell">
+            <div class="container-img d-flex align-items-center gap-3">
+              <span>
+                <button type="button" class="bg-transparent border border-0" @click="removeFavorite(cryptos.uuid)">
+                  <font-awesome-icon :icon="['fa', 'heart']" style="font-size: 1.2em; color: blueviolet;" />
                 </button>
-                <p class="mb-0 text-white fw-semibold">{{ cryptos.rank }}</p>
-                <div v-if="cryptos.iconUrl === null">
-                  <span style="font-size: 1.7em; color: brown">
-                    <font-awesome-icon icon="fa-regular fa-clone" />
-                  </span>
-                </div>
-                <div v-else>
-                  <img
-                    :src="cryptos.iconUrl"
-                    class=""
-                    height="30"
-                    width="30"
-                    alt="coin icon"
-                  />
-                </div>
+              </span>
+              <span>
+                {{ cryptos.rank }}
+              </span>
+              <span>
                 <a :href="cryptos.coinrankingUrl" class="text-decoration-none">
-                  <div>
-                    <p class="mb-0 text-white fw-semibold">
-                      {{ cryptos.name || "--" }}
-                    </p>
-                  </div>
-                  <div>
-                    <p class="mb-0 text-white text-opacity-75 fw-normal">
-                      {{ cryptos.symbol || "--" }}
-                    </p>
-                  </div>
+                  <img v-if="cryptos.iconUrl" :src="cryptos.iconUrl" class="" height="30" width="30" alt="coin icon" />
+                  <font-awesome-icon v-else :icon="['fa', 'clone']" style="font-size: 1.7em; color: brown;" />
                 </a>
-              </div>
-            </td>
-            <td>
-              <p class="mb-0 text-white fw-semibold">
-                {{ cryptos.price || "--" }}
-              </p>
-            </td>
-            <td class="market">
-              <p class="mb-0 text-white fw-semibold">
-                {{ cryptos.marketCap || "--" }}
-              </p>
-            </td>
-            <td>
-              <div class="chart-container">
-                <p
-                  class="mb-0"
-                  :style="{
-                    color: cryptos.change
-                      ? cryptos.change?.includes('-')
-                        ? '#FF1E1E'
-                        : '#00FFB3'
-                      : '#5f80b2',
-                  }"
-                >
-                  {{
-                    cryptos.change
-                      ? cryptos.change?.includes("-")
-                        ? cryptos.change
-                        : "+" + cryptos.change
-                      : "--%"
-                  }}
-                </p>
+              </span>
+              <span>
+                <a :href="cryptos.coinrankingUrl" class="text-decoration-none">
+                  <p class="mb-0 text-white">
+                    {{ cryptos.name || "--" }}
+                  </p>
+                  <span></span>
+                  <p class="mb-0 text-white text-opacity-75">
+                    {{ cryptos.symbol || "--" }}
+                  </p>
+                </a>
+              </span>
+            </div>
+          </td>
 
-                <div
-                  class="change__placeholder"
-                  style="position: relative; width: 7vw"
-                >
-                  <span>
-                    <canvas
-                      :id="`myChart-${index}`"
-                      width="96"
-                      height="37"
-                      style="width: 64px; height: 25px"
-                    >
-                      Your browser does not support the canvas element.</canvas
-                    >
-                  </span>
-                </div>
-              </div>
-            </td>
-          </tr>
-        </tbody>
+          <!--   -->
 
-        <div class="text-center" v-else>
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
+          <td class="table-cell align-middle price">
+            {{ convertirADolar(parseFloat(cryptos.price)) || "--" }}
+            <span class="d-none">
+              {{ identificarCantidadMonetaria(parseFloat(cryptos.marketCap)) || "--" }}
+            </span>
+          </td>
+
+          <!--   -->
+          <td class="table-cell align-middle hide">
+            {{ identificarCantidadMonetaria(parseFloat(cryptos.marketCap)) || "--" }}
+          </td>
+          <!--   -->
+
+          <td class="table-cell text-end d-flex justify-content-end ">
+            <div :style="{ color: cryptos.change ? cryptos.change?.includes('-') ? '#FF1E1E' : '#00FFB3' : '#5f80b2' }">
+              {{ cryptos.change ? cryptos.change?.includes("-") ? cryptos.change : "+" + cryptos.change : "--%" }}
+              <div class="mt-1" style="width: 64px; height: 25px">
+                <span>
+                  <canvas :id="`myChart-${index}`" width="96" height="37" style="width: 64px; height: 25px">
+                    Your browser does not support the canvas element.</canvas>
+                </span>
+              </div>
+            </div>
+          </td>
+          <!--   -->
+        </tr>
+
+      </tbody>
+
+      <div class="text-center" v-else>
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
         </div>
-      </table> -->
-    <!-- </div> -->
+      </div>
+
+    </table>
   </div>
 
   <div class="container text-center">
@@ -275,18 +272,11 @@ watchEffect(() => {
   </div>
 
   <div class="no-favorites" v-if="!noResults">
-    <img
-      src="https://cdn.coinranking.com/assets/img/no-favorites-dark.77b6524.png"
-      srcset="
-        https://cdn.coinranking.com/assets/img/no-favorites-dark.77b6524.png    1x,
-        https://cdn.coinranking.com/assets/img/no-favorites-dark@2x.f154e5f.png 2x,
-        https://cdn.coinranking.com/assets/img/no-favorites-dark@3x.2a17684.png 3x
-      "
-      alt=""
-      width="98"
-      height="56"
-      class="no-favorites__icon"
-    />
+    <img src="https://cdn.coinranking.com/assets/img/no-favorites-dark.77b6524.png" srcset="
+                                              https://cdn.coinranking.com/assets/img/no-favorites-dark.77b6524.png    1x,
+                                              https://cdn.coinranking.com/assets/img/no-favorites-dark@2x.f154e5f.png 2x,
+                                              https://cdn.coinranking.com/assets/img/no-favorites-dark@3x.2a17684.png 3x
+                                            " alt="" width="98" height="56" class="no-favorites__icon" />
     <h2 class="no-favorites__title">No favorites</h2>
     <p class="no-favorites__paragraph">
       Add coins to your favorites by clicking their heart icons.
@@ -294,3 +284,42 @@ watchEffect(() => {
     <a href="/" class="no-favorites__button active-link"> Go to all coins </a>
   </div>
 </template>
+
+<style scoped>
+.text-table {
+  color: white;
+  font-family: "Quicksand", sans-serif;
+  font-size: 12px;
+}
+
+.container-fluid {
+  padding: 0 92px;
+}
+
+.price {
+  white-space: nowrap;
+}
+
+@media only screen and (max-width: 792px) {
+  .container-fluid {
+    padding: 0 10px;
+  }
+
+  .hide {
+    display: none;
+  }
+
+  .text-table {
+    font-size: 12px;
+
+  }
+
+  .table-cell {
+    padding: 2px;
+  }
+
+  .container-img {
+    gap: 10px !important
+  }
+}
+</style>
