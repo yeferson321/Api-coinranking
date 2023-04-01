@@ -1,12 +1,12 @@
 <template>
-    <nav class="navbar navbar-expand-lg py-4">
-        <div class="container-fluid">
-            <router-link to="/" class="navbar-brand text-decoration-none fs-4 text-light">
+    <nav class="navbar">
+        <div class="container">
+            <router-link to="/" class="navbar-brand">
                 <img src="https://firebasestorage.googleapis.com/v0/b/apideployusers.appspot.com/o/apicoins%2Fbitcoin%20(1).png?alt=media&token=a1562b80-05b3-482a-aeaf-7bad41363fb5"
-                    alt="Platform loog" width="28" height="28" class="d-inline-block align-text-top">
+                    alt="Platform loog" width="28" height="28" class="img">
                 Crypto
             </router-link>
-            <div class="d-flex">
+            <div>
                 <ul class="nav">
                     <li class="nav-item rapid-api">
                         <a class="nav-link" href="https://rapidapi.com/Coinranking/api/coinranking1" target="_blank"
@@ -20,9 +20,9 @@
                         <a class="nav-link" href="https://www.chartjs.org/docs/latest/" target="_blank"
                             rel="noopener">Chartjs</a>
                     </li>
-                    <li class="nav-item ps-3">
-                        <a class="btn btn-outline-light px-4" href="https://github.com/yeferson321/Api-coinranking"
-                            role="button">GitHub</a>
+                    <li class="nav-item">
+                        <a class="btn" href="https://github.com/yeferson321/Api-coinranking" role="button" target="_blank"
+                            rel="noopener">GitHub</a>
                     </li>
                 </ul>
             </div>
@@ -31,19 +31,46 @@
 </template>
 
 <style scoped>
-
-.navbar-brand {
-    font-family: 'Quicksand', sans-serif;
-    color: #ffffff;
+.navbar {
+    padding: 1.5rem 0rem;
 }
 
-.container-fluid {
-    margin: 0 80px;
+.container {
+    padding: 0px 100px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar-brand {
+    text-decoration: none;
+    font-size: 24px;
+    font-family: 'Quicksand', sans-serif;
+    color: #ffffff;
+    padding: 5px 0px;
+    white-space: nowrap;
+    margin-right: 16px;
+    min-width: 172px;
+}
+
+.img {
+    vertical-align: text-top;
+}
+
+.nav {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+    padding-left: 0px;
+    margin: auto;
 }
 
 .nav-link {
     font-family: 'Quicksand', sans-serif;
     color: #ffffff;
+    padding: 8px 16px;
+    text-decoration: none;
+    display: block;
 }
 
 .nav-link:hover {
@@ -51,7 +78,20 @@
 }
 
 .btn {
+    border-radius: 6px;
+    border: 1px solid #ffffff;
+    color: #ffffff;
+    text-decoration: none;
     font-family: 'Quicksand', sans-serif;
+    margin-left: 16px;
+    padding: 8px 24px;
+    display: block;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+
+.btn:hover {
+    background-color: #ffffff;
+    color: #000000;
 }
 
 @media only screen and (max-width: 992px) {
@@ -61,13 +101,12 @@
 }
 
 @media only screen and (max-width: 792px) {
-    .coin-ranking {
-        display: none;
+    .container {
+        padding: 0 20px;
     }
 
-    .container-fluid {
-        margin: 0 15px;
-        
+    .coin-ranking {
+        display: none;
     }
 }
 

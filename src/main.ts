@@ -1,8 +1,8 @@
 import { createApp } from 'vue'
 import router from './router/main'
 import App from './App.vue'
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap/dist/js/bootstrap.js';
+// import 'bootstrap/dist/css/bootstrap.css';
+// import 'bootstrap/dist/js/bootstrap.js';
 import './style.css'
 
 /* import the fontawesome core */

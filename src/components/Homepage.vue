@@ -5,6 +5,7 @@ import { Chart, ChartConfiguration } from "chart.js/auto";
 import { getCoinsCurrencies } from "../services/CoinService";
 import { Coin, Stats } from "../interfaces/Data";
 import Navbar from "../components/Navbar.vue";
+import Section from "../components/Section.vue"
 import Search from "../components/SearchHomepage.vue";
 
 const coins: Ref<Coin[]> = ref([]);
@@ -152,12 +153,14 @@ watchEffect(async () => {
 
 <template>
   <Navbar />
+
+  <Section :stats="stats"></Section>
+
   <Search
     @onChangeCoins="coins = $event"
     @onChangeState="noFound = $event"
     :loadDate="loadData"
     :search="search"
-    :stats="stats"
   />
 
   <div>
@@ -268,12 +271,13 @@ watchEffect(async () => {
             </td>
           </tr>
         </tbody>
-
         <div class="text-center" v-else>
           <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
         </div>
+
+
       </table>
     </div>
   </div>
