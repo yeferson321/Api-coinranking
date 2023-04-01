@@ -7,6 +7,7 @@ import { Coin, Stats } from "../interfaces/Data";
 import Navbar from "../components/Navbar.vue";
 import Section from "../components/Section.vue";
 import SearchFavorites from "../components/SearchFavorites.vue";
+import Footer from "../components/Footer.vue"
 
 const coins: Ref<Coin[]> = ref([]);
 const stats: Ref<Stats> = ref({} as Stats);
@@ -103,6 +104,7 @@ const loadData = async (): Promise<void> => {
       coins.value = data.coins;
       stats.value = data.stats;
       isLoading.value = false;
+      noFound.value = true
     } catch (err: unknown) {
       error.value = (err as Error).message;
     }
@@ -169,14 +171,14 @@ watchEffect(() => {
 </script>
 
 <template>
-  <Navbar />
-  <Section :stats="stats"></Section>
+  <Navbar/>
+  <Section :stats="stats" />
   <SearchFavorites @onChangeCoins="coins = $event" @onChangeState="noFound = $event" @onChangeResult="noResults = $event"
     :loadData="searchCoins" :search="search" :coins="coins" />
 
-  <div class="containe-table">
-
+  <div class="container-table">
     <table>
+      <!-- thead -->
       <thead>
         <tr>
           <th>All coins favorites</th>
@@ -185,16 +187,19 @@ watchEffect(() => {
           <th class="th-right">Sparkline</th>
         </tr>
       </thead>
+      <!-- tbody -->
       <tbody v-if="!isLoading">
+        <!-- tr -->
         <tr>
           <td colspan="4">
             <div style="height: 30px;"></div>
           </td>
         </tr>
+        <!-- tr -->
         <tr v-for="(cryptos, index) in coins" :key="index">
-          <!---->
+          <!-- td -->
           <td>
-            <div class="tbody-one">
+            <div class="td-icon">
               <span>
                 <button type="button" class="btn" @click="removeFavorite(cryptos.uuid)">
                   <font-awesome-icon :icon="['fa', 'heart']" style="font-size: 1.2em; color: blueviolet;" />
@@ -213,23 +218,23 @@ watchEffect(() => {
                 </a>
               </span>
               <span>
-                <a :href="cryptos.coinrankingUrl" class="tbody-one-link">{{ cryptos.name || "--" }}</a>
-                <span class="tbody-one-symbol">{{ cryptos.symbol || "--" }}</span>
+                <a :href="cryptos.coinrankingUrl" class="td-icon-link">{{ cryptos.name || "--" }}</a>
+                <span class="td-icon-symbol">{{ cryptos.symbol || "--" }}</span>
               </span>
             </div>
           </td>
-          <!---->
+          <!-- td -->
           <td class="td-price">
             {{ convertirADolar(parseFloat(cryptos.price)) || "--" }}
             <span class="td-show">
               {{ identificarCantidadMonetaria(parseFloat(cryptos.marketCap)) || "--" }}
             </span>
           </td>
-          <!---->
+          <!-- td -->
           <td class="td-hide">
             {{ identificarCantidadMonetaria(parseFloat(cryptos.marketCap)) || "--" }}
           </td>
-          <!---->
+          <!-- td -->
           <td class="td-right">
             <div :style="{ color: cryptos.change ? cryptos.change?.includes('-') ? '#FF1E1E' : '#00FFB3' : '#5f80b2' }">
               {{ cryptos.change ? cryptos.change?.includes("-") ? cryptos.change : "+" + cryptos.change : "--%" }}
@@ -241,54 +246,49 @@ watchEffect(() => {
               </div>
             </div>
           </td>
-          <!--   -->
+          <!---->
         </tr>
+        <!---->
       </tbody>
-
-      <div class="text-center" v-else>
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-      </div>
-
     </table>
 
-    <div class="no-results" v-if="!noFound">
-      <img src="https://cdn.coinranking.com/assets/img/no-favorites-dark.77b6524.png" srcset="
-                                                                          https://cdn.coinranking.com/assets/img/no-favorites-dark.77b6524.png    1x,
-                                                                          https://cdn.coinranking.com/assets/img/no-favorites-dark@2x.f154e5f.png 2x,
-                                                                          https://cdn.coinranking.com/assets/img/no-favorites-dark@3x.2a17684.png 3x
-                                                                        " alt="" width="98" height="56"
-        class="no-favorites__icon" />
+    <!-- loading -->
+    <div class="loading" v-if="isLoading">
+      <span class="loading-text">Loading...</span>
+    </div>
+    <!---->
 
-
-
-      <h2>No results</h2>
-      <p class="no-favorites__paragraph">
-        We couldn't find a result matching nouin.
-      </p>
-      <button>
+    <!-- no found -->
+    <div class="results" v-if="!noFound">
+      <font-awesome-icon :icon="['fa', 'magnifying-glass']" style="font-size: 2em; color: #ffffffc8;" />
+      <h3 class="results-text">No results</h3>
+      <p class="results-text">We couldn't find a result matching the name.</p>
+      <button type="button" class="btn-results" @click="searchCoins()">
         Go back
       </button>
     </div>
+    <!---->
 
-    <div class="no-results" v-if="!noResults">
-
-      <h2 class="no-favorites__title">No favorites</h2>
-      <p class="no-favorites__paragraph">
-        Add coins to your favorites by clicking their heart icons.
-      </p>
-      <router-link to="/" class="navbar-brand">
-        Go to all coins
+    <!-- no results -->
+    <div class="results" v-if="!noResults">
+      <font-awesome-icon :icon="['fa', 'heart']" style="font-size: 2em; color: blueviolet;" />
+      <h3 class="results-text">No favorites</h3>
+      <p class="results-text">Add coins to your favorites by clicking their heart icons.</p>
+      <router-link to="/">
+        <button type="button" class="btn-results">
+          Go to all coins
+        </button>
       </router-link>
     </div>
-
+    <!-- -->
   </div>
+
+  <Footer/>
 </template>
 
 <style scoped>
-.containe-table {
-  padding: 0px 100px;
+.container-table {
+  padding: 0px 100px 50px;
 }
 
 table {
@@ -299,7 +299,7 @@ table {
   font-size: 16px;
 }
 
-.tbody-one {
+.td-icon {
   display: flex;
   align-items: center;
   gap: 30px;
@@ -322,12 +322,12 @@ table {
   overflow: hidden;
 }
 
-.tbody-one-link {
+.td-icon-link {
   text-decoration: none;
   color: #ffffff;
 }
 
-.tbody-one-symbol {
+.td-icon-symbol {
   margin-top: 5px;
   color: #ffffffc8;
   display: block;
@@ -340,7 +340,7 @@ td {
   padding: 8px;
 }
 
-.td-price{
+.td-price {
   white-space: nowrap;
 }
 
@@ -366,16 +366,53 @@ td {
   border: 0;
 }
 
-.no-results {
-  display: block;
+.loading {
   text-align: center;
   padding: 50px 20px;
 }
 
+.loading-text {
+  font-family: "Quicksand", sans-serif;
+  color: #ffffffc8;
+}
+
+.results {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 13px;
+  padding: 50px 20px;
+}
+
+.results-text {
+  text-align: center;
+  font-family: "Quicksand", sans-serif;
+  color: #ffffffc8;
+}
+
+.btn-results {
+  cursor: pointer;
+  padding: 8px 18px;
+  border-radius: 6px;
+  background-color: #032c6b;
+  color: #ffffffc8;
+  border: none;
+  font-size: 14px;
+  font-family: "Quicksand", sans-serif;
+  white-space: nowrap;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.btn-results:hover {
+  background-color: #003381;
+  color: #ffffff;
+}
+
 @media only screen and (max-width: 792px) {
-  .containe-table {
+  .container-table {
     padding: 0 10px;
   }
+
   .th-hide {
     display: none;
   }
@@ -400,7 +437,7 @@ td {
     padding: 2px;
   }
 
-  .tbody-one {
+  .td-icon {
     gap: 10px;
   }
 

@@ -1,9 +1,9 @@
 body {
-  background-color: #0A0A0F;
+  background-color: rgba(0, 0, 0, 0.973);
   padding: 0%;
   margin: 0%;
 }
 
-h5, p {
+h5, h3, h2, h1, p {
   margin: auto;
 }

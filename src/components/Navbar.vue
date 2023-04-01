@@ -74,7 +74,7 @@
 }
 
 .nav-link:hover {
-    color: #2904fa;
+    color: #007CF0;
 }
 
 .btn {
