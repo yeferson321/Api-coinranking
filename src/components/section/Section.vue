@@ -13,6 +13,24 @@ const props = defineProps({
     }
 });
 
+// `const showTooltip` is a function that takes in a string parameter `tooltipId` representing the ID
+// of a tooltip element. The function then uses `document.getElementById` to retrieve the tooltip
+// element with the specified ID and adds the CSS class `show` to it using `classList.add`. This class
+// likely controls the visibility of the tooltip element.
+const showTooltip = (tooltipId: string) => {
+    const tooltip = document.getElementById(tooltipId) as HTMLDivElement;
+    tooltip?.classList.add('show');
+}
+
+// `const hideTooltip` is a function that takes in a string parameter `tooltipId` representing the ID
+// of a tooltip element. The function then uses `document.getElementById` to retrieve the tooltip
+// element with the specified ID and removes the CSS class `show` from it using `classList.remove`.
+// This class likely controls the visibility of the tooltip element.
+const hideTooltip = (tooltipId: string) => {
+    const tooltip = document.getElementById(tooltipId);
+    tooltip?.classList.remove('show');
+}
+
 // is a function that takes in a number `valor` and returns a string that represents the 
 // monetary value with a currency symbol, suffix (K, Million, Billion, Trillion)
 const identificarCantidadMonetaria = (valor: number) => {
@@ -33,16 +51,6 @@ const identificarCantidadMonetaria = (valor: number) => {
     // the `sufijos` array based on the value of `i`.
     return simbolo + valor.toFixed(precision) + sufijos[i];
 };
-
-const showTooltip = () => {
-    const canvasTag = document.getElementById('tooltip') as HTMLDivElement;
-    canvasTag.style.display = 'block'
-}
-
-const hideTooltip = () => {
-    const canvasTag = document.getElementById('tooltip') as HTMLDivElement;
-    canvasTag.style.display = 'none'
-}
 </script>
 
 <template>
@@ -59,9 +67,10 @@ const hideTooltip = () => {
                 <div class="container-col">
                     <div class="card-body">
                         <h5 v-if="!isLoading" class="col-text">
-                            <div class="tooltip" id="tooltip">The market cap of All coins combined.</div>
                             {{ identificarCantidadMonetaria(parseFloat(props.stats.totalMarketCap)) }}
-                            <font-awesome-icon :icon="['fa', 'circle-info']" style="font-size: 0.8em; color: #007CF0;" @mouseenter="showTooltip()"  @mouseleave="hideTooltip()" />
+                            <div class="tooltip" id="market-cap-tooltip">The market cap of All coins combined.</div>
+                            <font-awesome-icon :icon="['fa', 'circle-info']" style="font-size: 0.8em; color: #007CF0;"
+                                @mouseenter="showTooltip('market-cap-tooltip')" @mouseleave="hideTooltip('market-cap-tooltip')" />
                         </h5>
                         <h5 v-else class="col-text">
                             loading...
@@ -70,9 +79,10 @@ const hideTooltip = () => {
                     </div>
                     <div class="card-body">
                         <h5 v-if="!isLoading" class="col-text">
-                            <!-- <div class="tooltip" id="tooltip">The 24 hour trading volume of All coins combined.</div> -->
                             {{ identificarCantidadMonetaria(parseFloat(props.stats.total24hVolume)) }}
-                            <font-awesome-icon :icon="['fa', 'circle-info']" style="font-size: 0.8em; color: #007CF0;"  @mouseenter="showTooltip()"  @mouseleave="hideTooltip()" />
+                            <div class="tooltip" id="volume-tooltip">The 24 hour trading volume of All coins combined.</div>
+                            <font-awesome-icon :icon="['fa', 'circle-info']" style="font-size: 0.8em; color: #007CF0;"
+                                @mouseenter="showTooltip('volume-tooltip')" @mouseleave="hideTooltip('volume-tooltip')" />
                         </h5>
                         <h5 v-else class="col-text">
                             loading...
@@ -114,15 +124,24 @@ const hideTooltip = () => {
     margin-bottom: 40px;
 }
 
+.card-body {
+    position: relative;
+}
+
 .tooltip {
-    position: absolute;
     background-color: aliceblue;
     color: #007CF0;
-    font-size: 12px;
-    padding: 6px;
+    font-size: 1rem;
+    padding: 8px;
     border-radius: 10px;
-    margin-top: -30px;
     display: none;
+    position: absolute;
+    bottom: 60px;
+    width: 300px;
+}
+
+.show {
+    display: block;
 }
 
 .gradient-text {
@@ -174,6 +193,10 @@ const hideTooltip = () => {
 
     .col-title {
         line-height: 60px;
+    }
+
+    .tooltip {
+        width: 170px;
     }
 }
 
