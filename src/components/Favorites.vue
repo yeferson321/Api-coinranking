@@ -4,10 +4,10 @@ import { Ref, watchEffect } from "vue";
 import { Chart, ChartConfiguration, ChartItem } from "chart.js/auto";
 import { getFavoritesCoinsCurrencies } from "../services/CoinService";
 import { Coin, Stats } from "../interfaces/Data";
-import Navbar from "../components/Navbar.vue";
-import Section from "../components/Section.vue";
+import Navbar from "../components/navbar/Navbar.vue";
+import Section from "../components/section/Section.vue"
 import SearchFavorites from "../components/SearchFavorites.vue";
-import Footer from "../components/Footer.vue"
+import Footer from "../components/footer/Footer.vue"
 
 const coins: Ref<Coin[]> = ref([]);
 const stats: Ref<Stats> = ref({} as Stats);
@@ -98,6 +98,7 @@ const renderChart = (coin: Coin, index: number): void => {
 
 const loadData = async (): Promise<void> => {
   const localUuid = localStorage.getItem("uuid");
+  
   if (localUuid) {
     try {
       const data = await getFavoritesCoinsCurrencies();
@@ -172,7 +173,8 @@ watchEffect(() => {
 
 <template>
   <Navbar/>
-  <Section :stats="stats" />
+  <Section :stats="stats" :isLoading="isLoading" />
+  
   <SearchFavorites @onChangeCoins="coins = $event" @onChangeState="noFound = $event" @onChangeResult="noResults = $event"
     :loadData="searchCoins" :search="search" :coins="coins" />
 

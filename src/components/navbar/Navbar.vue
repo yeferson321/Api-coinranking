@@ -1,6 +1,6 @@
 <template>
     <nav class="navbar">
-        <div class="container">
+        <div class="container-navbar">
             <router-link to="/" class="navbar-brand">
                 <img src="https://firebasestorage.googleapis.com/v0/b/apideployusers.appspot.com/o/apicoins%2Fbitcoin%20(1).png?alt=media&token=a1562b80-05b3-482a-aeaf-7bad41363fb5"
                     alt="Platform loog" width="28" height="28" class="img">
@@ -35,7 +35,7 @@
     padding: 1.5rem 0rem;
 }
 
-.container {
+.container-navbar {
     padding: 0px 100px;
     display: flex;
     align-items: center;
@@ -50,7 +50,7 @@
     padding: 5px 0px;
     white-space: nowrap;
     margin-right: 16px;
-    min-width: 172px;
+    min-width: 195px;
 }
 
 .img {
@@ -101,7 +101,7 @@
 }
 
 @media only screen and (max-width: 792px) {
-    .container {
+    .container-navbar {
         padding: 0 20px;
     }
 

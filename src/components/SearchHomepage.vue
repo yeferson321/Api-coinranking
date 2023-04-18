@@ -78,7 +78,7 @@ const handleSearchClear = () => {
 .container-search {
   display: flex;
   justify-content: space-between;
-  padding: 0px 80px;
+  padding: 0px 100px;
 }
 
 .container-input {
@@ -86,6 +86,7 @@ const handleSearchClear = () => {
   align-items: center;
   flex-grow: 1;
   max-width: 350px;
+  min-width: 223px;
 }
 
 .form-input {
@@ -119,14 +120,19 @@ const handleSearchClear = () => {
 
 .btn {
   cursor: pointer;
-  padding: 8px 12px;
-  border-radius: 6px;
-  background-image: linear-gradient(25deg, #2904fa, #96008a);
-  color: white;
-  border: none;
-  font-size: 14px;
-  font-family: "Quicksand", sans-serif;
-  white-space: nowrap;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background-color: transparent;
+    border: 1px solid #007CF0;
+    color: white;
+    font-size: 14px;
+    font-family: "Quicksand", sans-serif;
+    white-space: nowrap;
+}
+
+.btn:hover {
+    background-color: #007CF0;
+    color: #ffffff;
 }
 
 @media only screen and (max-width: 792px) {

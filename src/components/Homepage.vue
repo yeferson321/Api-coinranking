@@ -4,9 +4,11 @@ import { Ref, watchEffect } from "vue";
 import { Chart, ChartConfiguration } from "chart.js/auto";
 import { getCoinsCurrencies } from "../services/CoinService";
 import { Coin, Stats } from "../interfaces/Data";
-import Navbar from "../components/Navbar.vue";
-import Section from "../components/Section.vue"
-import Search from "../components/SearchHomepage.vue";
+import Navbar from "../components/navbar/Navbar.vue";
+import Section from "../components/section/Section.vue"
+import SearchHomepage from "../components/SearchHomepage.vue";
+import Pagination from "../components/Pagination.vue";
+import Footer from "../components/footer/Footer.vue"
 
 const coins: Ref<Coin[]> = ref([]);
 const stats: Ref<Stats> = ref({} as Stats);
@@ -15,11 +17,11 @@ const noFound: Ref<boolean> = ref(true);
 const error: Ref<string> = ref("");
 const isIconActive: Ref<boolean> = ref(false);
 const offset: Ref<number> = ref(0);
-const pageCount = ref<number[]>([]);
+
 const charts: Chart[] = [];
 
 const renderChart = (coin: Coin, index: number): void => {
-  const { sparkline, change } = coin;
+  const { sparkline, change } = coin
   const spark = sparkline || ["0", "0"];
 
   const canvasTag = document.getElementById(
@@ -137,209 +139,310 @@ const changeIco = (uuid: string) => {
   }
 };
 
-const setPagination = (total: number) => {
-  let Count = Math.ceil(total / 50);
-  for (let i = 2; i <= Count; i++) {
-    pageCount.value.push(i);
+const identificarCantidadMonetaria = (valor: number) => {
+  const sufijos = [" ", " D", " M", " B", " T"]; // Sufijos de los miles, millones, billones y billones de billones
+  const precision = 2; // Precisión decimal para el redondeo
+  let simbolo = "$ "; // Símbolo de la moneda
+
+  let i = 0; // Índice para el arreglo de sufijos
+  while (valor >= 1000) {
+    valor /= 1000;
+    i++;
   }
+
+  return simbolo + valor.toFixed(precision) + sufijos[i];
 };
+
+const convertirADolar = (numero: number) => {
+  // Formatear el número con dos decimales y separador de miles
+  let valorFormateado = numero.toFixed(3).replace(/\d(?=(\d{3})+\.)/g, "$&,");
+  let simbolo = "$ "; // Símbolo de la moneda
+
+  return simbolo + valorFormateado;
+}
 
 watchEffect(async () => {
   await loadData(offset.value);
   coins.value.forEach(renderChart);
-  setPagination(stats.value.total);
 });
 </script>
 
 <template>
   <Navbar />
 
-  <Section :stats="stats"></Section>
+  <Section :stats="stats" :isLoading="isLoading"></Section>
 
-  <Search
-    @onChangeCoins="coins = $event"
-    @onChangeState="noFound = $event"
-    :loadDate="loadData"
-    :search="search"
-  />
+  <SearchHomepage @onChangeCoins="coins = $event" @onChangeState="noFound = $event" :loadDate="loadData" :search="search" />
 
-  <div>
-    <div class="container">
-      <table class="table table-borderless ps-5">
-        <thead>
-          <tr class="text-white">
-            <th>All coins</th>
-            <th>Price</th>
-            <th>Market cap</th>
-            <th>Sparkline</th>
-          </tr>
-        </thead>
-
-        <tbody v-if="!isLoading">
-          <tr v-for="(cryptos, index) in coins" :key="index">
-            <td>
-              <div class="d-flex align-items-center gap-3">
-                <button
-                  type="button"
-                  class="search-clear bg-transparent border border-0"
-                  @click="addFavorite(cryptos.uuid)"
-                >
-                  <font-awesome-icon
-                    :icon="['fas', 'heart']"
-                    :style="[
-                      changeIco(cryptos.uuid),
-                      isIconActive ?? { color: '#b2b332' },
-                    ]"
-                  />
+  <div class="container-table">
+    <table class="table table-borderless ps-5">
+      <!-- thead -->
+      <thead>
+        <tr>
+          <th>All coins favorites</th>
+          <th>Price</th>
+          <th class="th-hide">Market cap</th>
+          <th class="th-right">Sparkline</th>
+        </tr>
+      </thead>
+      <!-- tbody -->
+      <tbody v-if="!isLoading">
+        <!-- tr -->
+        <tr>
+          <td colspan="4">
+            <div style="height: 30px;"></div>
+          </td>
+        </tr>
+        <!-- tr -->
+        <tr v-for="(cryptos, index) in coins" :key="index">
+          <!-- td -->
+          <td>
+            <div class="td-icon">
+              <span>
+                <button type="button" class="btn" @click="addFavorite(cryptos.uuid)">
+                  <font-awesome-icon :icon="['fas', 'heart']" :style="[
+                    changeIco(cryptos.uuid),
+                    isIconActive ?? { color: '#b2b332' },
+                  ]" />
                 </button>
-                <p class="mb-0 text-white fw-semibold">{{ cryptos.rank }}</p>
-                <div v-if="cryptos.iconUrl === null">
-                  <span style="font-size: 1.7em; color: brown">
-                    <font-awesome-icon icon="fa-regular fa-clone" />
+              </span>
+              <span>
+                {{ cryptos.rank }}
+              </span>
+              <span>
+                <a :href="cryptos.coinrankingUrl" target="_blank" rel="noopener">
+                  <span class="logo-background">
+                    <img v-if="cryptos.iconUrl" class="coin-icon" :src="cryptos.iconUrl" height="30" width="30"
+                      alt="coin icon" />
+                    <font-awesome-icon v-else :icon="['fa', 'clone']" style="font-size: 1.7em; color: brown;" />
                   </span>
-                </div>
-                <div v-else>
-                  <img
-                    :src="cryptos.iconUrl"
-                    class=""
-                    height="30"
-                    width="30"
-                    alt="coin icon"
-                  />
-                </div>
-                <a :href="cryptos.coinrankingUrl" class="text-decoration-none">
-                  <div>
-                    <p class="mb-0 text-white fw-semibold">
-                      {{ cryptos.name || "--" }}
-                    </p>
-                  </div>
-                  <div>
-                    <p class="mb-0 text-white text-opacity-75 fw-normal">
-                      {{ cryptos.symbol || "--" }}
-                    </p>
-                  </div>
                 </a>
+              </span>
+              <span>
+                <a :href="cryptos.coinrankingUrl" class="td-icon-link" target="_blank" rel="noopener">{{ cryptos.name || "--" }}</a>
+                <span class="td-icon-symbol">{{ cryptos.symbol || "--" }}</span>
+              </span>
+            </div>
+          </td>
+          <!-- td -->
+          <td class="td-price">
+            {{ convertirADolar(parseFloat(cryptos.price)) || "--" }}
+            <span class="td-show">
+              {{ identificarCantidadMonetaria(parseFloat(cryptos.marketCap)) || "--" }}
+            </span>
+          </td>
+          <!-- td -->
+          <td class="td-hide">
+            {{ identificarCantidadMonetaria(parseFloat(cryptos.marketCap)) || "--" }}
+          </td>
+          <!-- td -->
+          <td class="td-right">
+            <div :style="{ color: cryptos.change ? cryptos.change?.includes('-') ? '#FF1E1E' : '#00FFB3' : '#5f80b2' }">
+              {{ cryptos.change ? cryptos.change?.includes("-") ? cryptos.change : "+" + cryptos.change : "--%" }}
+              <div style="width: 64px; height: 25px">
+                <span>
+                  <canvas :id="`myChart-${index}`" width="96" height="37" style="width: 64px; height: 25px">
+                    Your browser does not support the canvas element.</canvas>
+                </span>
               </div>
-            </td>
-            <td>
-              <p class="mb-0 text-white fw-semibold">
-                {{ cryptos.price || "--" }}
-              </p>
-            </td>
-            <td class="market">
-              <p class="mb-0 text-white fw-semibold">
-                {{ cryptos.marketCap || "--" }}
-              </p>
-            </td>
-            <td>
-              <div class="chart-container">
-                <p
-                  class="mb-0"
-                  :style="{
-                    color: cryptos.change
-                      ? cryptos.change?.includes('-')
-                        ? '#FF1E1E'
-                        : '#00FFB3'
-                      : '#5f80b2',
-                  }"
-                >
-                  {{
-                    cryptos.change
-                      ? cryptos.change?.includes("-")
-                        ? cryptos.change
-                        : "+" + cryptos.change
-                      : "--%"
-                  }}
-                </p>
+            </div>
+          </td>
+          <!---->
+        </tr>
+        <!---->
+      </tbody>
+    </table>
 
-                <div
-                  class="change__placeholder"
-                  style="position: relative; width: 7vw"
-                >
-                  <span>
-                    <canvas
-                      :id="`myChart-${index}`"
-                      width="96"
-                      height="37"
-                      style="width: 64px; height: 25px"
-                    >
-                      Your browser does not support the canvas element.</canvas
-                    >
-                  </span>
-                </div>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-        <div class="text-center" v-else>
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </div>
-
-
-      </table>
+    <!-- loading -->
+    <div class="loading" v-if="isLoading">
+      <span class="loading-text">Loading...</span>
     </div>
+    <!---->
+
+    <!-- no found -->
+    <div class="results" v-if="!noFound">
+      <font-awesome-icon :icon="['fa', 'magnifying-glass']" style="font-size: 2em; color: #ffffffc8;" />
+      <h3 class="results-text">No results</h3>
+      <p class="results-text">We couldn't find a result matching the name.</p>
+      <button type="button" class="btn-results" @click="loadData(0)">
+        Go back
+      </button>
+    </div>
+    <!---->
+
   </div>
 
-  <div class="container text-center">
-    <h2 v-if="!noFound">sin resultados</h2>
-  </div>
+  <Pagination @offsef="offset = $event" :stats="stats" ></Pagination>
 
-  <div>
-    <nav aria-label="Page navigation example">
-      <ul class="pagination justify-content-center">
-        <li class="page-item">
-          <a class="page-link" href="#" @click="offset -= 50">Previous</a>
-        </li>
-
-        <li @click="offset = 0" class="page-item">
-          <a class="page-link" href="#">1</a>
-        </li>
-
-        <li
-          v-for="page in pageCount.slice(offset / 50 - 0, offset / 50 + 3)"
-          :key="page"
-          @click="offset = (page - 1) * 50"
-          class="page-item"
-        >
-          <a class="page-link" href="#">{{ page }}</a>
-        </li>
-
-        <li @click="offset = stats.total - 50" class="page-item">
-          <a class="page-link" href="#">{{ Math.ceil(stats.total / 50) }}</a>
-        </li>
-
-        <li class="page-item">
-          <a class="page-link" href="#" @click="offset += 50">Next</a>
-        </li>
-      </ul>
-    </nav>
-  </div>
+  <Footer />
 </template>
 
 <style scoped>
-@media only screen and (max-width: 576px) {
-  .container {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
-
-  .offcanvas {
-    width: 60%;
-  }
+.page {
+  padding: 0px 100px 50px;
 }
 
-@media only screen and (max-width: 768px) {
-  .market {
+.container-table {
+  padding: 0px 100px;
+}
+
+table {
+  width: 100%;
+  font-family: "Quicksand", sans-serif;
+  color: #ffffff;
+  align-items: center;
+  font-size: 16px;
+}
+
+.td-icon {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  max-width: 100%;
+}
+
+.coin-icon {
+  height: 20px;
+}
+
+.logo-background {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 25px;
+  width: 25px;
+  background-color: #fff;
+  border: 3px solid #fff;
+  border-radius: 40px;
+  overflow: hidden;
+}
+
+.td-icon-link {
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.td-icon-symbol {
+  margin-top: 5px;
+  color: #ffffffc8;
+  display: block;
+  font-size: 12px;
+}
+
+th,
+td {
+  text-align: inherit;
+  padding: 8px;
+}
+
+.td-price {
+  white-space: nowrap;
+}
+
+.th-right {
+  text-align: right;
+}
+
+.td-right {
+  display: flex;
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.td-show {
+  font-size: 12px;
+  margin-top: 5px;
+  color: #ffffffc8;
+  display: none;
+}
+
+.btn {
+  background-color: transparent;
+  border: 0;
+}
+
+.loading {
+  text-align: center;
+  padding: 50px 20px;
+}
+
+.loading-text {
+  font-family: "Quicksand", sans-serif;
+  color: #ffffffc8;
+}
+
+.results {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 13px;
+  padding: 50px 20px;
+}
+
+.results-text {
+  text-align: center;
+  font-family: "Quicksand", sans-serif;
+  color: #ffffffc8;
+}
+
+.btn-results {
+  cursor: pointer;
+  padding: 8px 18px;
+  border-radius: 6px;
+  background-color: #032c6b;
+  color: #ffffffc8;
+  border: none;
+  font-size: 14px;
+  font-family: "Quicksand", sans-serif;
+  white-space: nowrap;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}
+
+.btn-results:hover {
+  background-color: #003381;
+  color: #ffffff;
+}
+
+@media only screen and (max-width: 792px) {
+  .container-table {
+    padding: 0 10px;
+  }
+
+  .th-hide {
     display: none;
   }
+
+  .td-hide {
+    display: none;
+  }
+
+  .td-show {
+    display: block;
+  }
 }
 
-@media only screen and (min-width: 992px) {
-  .container {
-    padding-right: 5rem !important;
-    padding-left: 5rem !important;
+@media only screen and (max-width: 592px) {
+
+  table {
+    font-size: 13px;
+  }
+
+  th,
+  td {
+    padding: 2px;
+  }
+
+  .td-icon {
+    gap: 10px;
+  }
+
+  .coin-icon {
+    height: 15px;
+  }
+
+  .logo-background {
+    height: 20px;
+    width: 20px;
   }
 }
 </style>
